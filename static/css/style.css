@@ -1,0 +1,37 @@
+h2 {
+    color: red;
+}
+
+.gold span{
+    border: solid 1px black;
+    padding: 2px;
+
+}
+
+.locations{
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.location {
+    border: solid 1px black;
+    padding: 10px;
+    display: inline-block;
+    text-align: center;
+}
+
+.activities {
+    margin-top: 20px;
+}
+.activity-list {
+    border: solid 2px black;
+    padding: 10px;
+}
+
+.green {
+    color: green;
+}
+
+.red {
+    color: red;
+}
