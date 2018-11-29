@@ -1,10 +1,14 @@
 from flask import Flask, render_template, redirect, session, request, flash
 from flask_bcrypt import Bcrypt
 from mysqlconnection import connectToMySQL
+from helpers import create_activity
+from helpers import calculate_gold
+from helpers import get_current_gold
+from helpers import update_user_gold
 import re
 
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
-SCHEMA = 'ninja_gold' #here we are giving putting our database in mysql into a variable called SCHEMA.
+SCHEMA = 'ninja_gold' #here we are giving putting our database in mysql into a variable called SCHEMA. we are defining globally.
 
 
 app = Flask(__name__)
@@ -21,7 +25,7 @@ def index():
     location_list = db.query_db(query)
 
     db = connectToMySQL(SCHEMA)
-    query = 'SELECT gold_amount, locations.name AS location FROM activities JOIN locations ON activities.location_id = locations.id WHERE activities.user_id = %(user_id)s;'
+    query = 'SELECT gold_amount, locations.name AS location FROM activities JOIN locations ON activities.location_id = locations.id WHERE activities.user_id = %(user_id)s ORDER BY activities.created_at DESC;'
     data = {
         'user_id': session['user_id']
     }
@@ -38,6 +42,30 @@ def index():
     # this is what is returned. It's in a list. It's in the zero index with the key label as 'gold' [{'gold': 0}]
 
     return render_template('index.html', locations = location_list, activities = activities_list, gold_total=gold)
+
+#update the users gold with this route.
+@app.route('/process', methods = ['post'])
+def process():
+    gold = calculate_gold(request.form['location']) #this will return something and it will be stored in the gold variable.
+    create_activity(session['user_id'], request.form['location'], gold) #remember this is a function. sending arguments to the helpers file def create_activity.
+    user_gold = get_current_gold(session['user_id'])
+    updated_gold = user_gold + gold
+    update_user_gold(session['user_id'], updated_gold)
+    print('*' *80)
+    print(user_gold)
+    return redirect('/')
+    #create an activity
+        #users_id comes from session
+        #location_id comes from the form
+        #gold amount has to be created
+            #get the location from the database
+            #create a randome number between the locations min/max value
+    #update the users gold
+    #create a helpers.py file. It's like a link css or link js. Makes your code less cluttered. 
+    #you can import the process from the helpers.py file. make sure to import it above.
+
+
+
 
 @app.route('/login_reg') #this page has our html registration and login forms.
 def login_reg():

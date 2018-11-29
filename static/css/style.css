@@ -26,6 +26,8 @@ h2 {
 .activity-list {
     border: solid 2px black;
     padding: 10px;
+    overflow-y: auto;
+    height: 200px;
 }
 
 .green {
